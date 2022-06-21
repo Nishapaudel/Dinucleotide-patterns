@@ -4,12 +4,12 @@ Dinucleotide is two adjacent nucleotides in a DNA separated by a single phosphat
 
 <p> <b>Supplementary file details  </b></p>
  <p>Supplementary file 1.ipynb - Jupyter notebook python code snippets for data mining, renaming, and filtering. </p> 
-<p>Supplementary file 2 - Refseq list  for eukaryotes provided as of Jan2  </p>
-<p>Supplementary_file_3_feature_extraction.py </p>
-<p>Supplementary_file_4_stat.py </p>
-<p>Supplementary_file_5_violin_arranged_data.py </p>
-<p>Supplementary_file_6_violin_plot.py </p>
-<p>Supplementary_file_7_cluster_heatmap.ipynb </p>
-<p>Supplementary_file_8.a_exons_ratio.py </p>
-<p>Supplementary_file_8.b_intron_ratio.py  </p>
-<p>Supplementary_file_8.c_promo_ratio.py  </p>
+<p>Supplementary file 2 - Refseq list  for eukaryotes provided as of Jan2  from NCBI</p>
+<p>Supplementary_file_3_feature_extraction.py,  this code will take the input of feature coodrinates such a say SINES or CpGisland and calculates the dinucleotide ratio </p>
+<p>Supplementary_file_4_stat.py  , this code will calculate basic statistics such as mean, median, mode , screwness and kurtosis of the ratio</p>
+<p>Supplementary_file_5_violin_arranged_data.py , this code will arrange our ratio data file into a formatted input file for violin plot</p>
+<p>Supplementary_file_6_violin_plot.py ,  This code will create a violin plot from holoviews library  </p>
+<p>Supplementary_file_7_cluster_heatmap.ipynb , this code will create cluster heat map based on euclidean distance </p>
+<p>Supplementary_file_8.a_exons_ratio.py , this code calculates the dinucleotide ratio of exons from GFF and 2bit file of an organism </p>
+<p>Supplementary_file_8.b_intron_ratio.py , this code calculates the dinucleotide ratio of intron  from GFF and 2bit file of an organism</p>
+<p>Supplementary_file_8.c_promo_ratio.py  , this code calculates the dinucleotide ratio of promoter from GFF and 2bit file of an organism </p>
