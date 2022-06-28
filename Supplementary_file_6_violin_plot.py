@@ -16,7 +16,7 @@ from scipy.stats import norm
 
 
  
-violin_data = sys.argv[1]
+violin_data = sys.argv[1] #The input for this file is output file form supplementary file 5 code.
 
 
 df = pd.read_csv(violin_data, sep = '\t')
