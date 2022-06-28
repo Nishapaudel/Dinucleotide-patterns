@@ -2,7 +2,7 @@ import os
 import sys
 
 file = sys.argv[1]
-#file = 'home/nisha/Desktop/Di.. Homo_sapiens_exons.txt'
+
 print('Dinucleotide', 'ratio', sep= '\t')
 
 with open (file) as fh:
@@ -44,18 +44,13 @@ with open (file) as fh:
         ApT =float(columns[5])
         print( 'ApT' , ApT, sep = '\t')
         
-        
 
         TpA =float(columns[8])
         print( 'TpA' , TpA, sep = '\t')
         
-        
-        
         CpG =float(columns[18])
         print( 'CpG' , CpG, sep = '\t')
-        
-        
-        
+           
         GpC =float(columns[15])
         print( 'GpC' , GpC, sep = '\t')
 
