@@ -4,8 +4,9 @@ import py2bit
 
  
 # set up variables
-bit_file = sys.argv[1]
-gff_file =sys.argv[2]
+bit_file = sys.argv[1] # The 2bit file of man we get from UCSC https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/
+
+gff_file =sys.argv[2] # The feature file obtained from https://genome.ucsc.edu/cgi-bin/hgTables, It should look like UCSC_feature_file_sample 
   
 
 chr_name = ''
