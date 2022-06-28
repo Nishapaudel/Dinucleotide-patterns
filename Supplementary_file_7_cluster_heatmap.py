@@ -13,7 +13,7 @@ import matplotlib.patches as mpatches
 import seaborn as sns
 #load data
 
-file = sys.argv[1] # This should contain the meta file that contains median of exon of ratio file....eg of this file plant is z_Plant_meta_file
+file = sys.argv[1] # This should contain the meta file that contains median of exon of ratio file....eg of this file plant is z_Plant_meta_file The output figures looks given bellow heat mmap.
 
 df = pd.read_table('file, sep = '\t')
 species = df['name']
