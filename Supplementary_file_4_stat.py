@@ -4,7 +4,7 @@ import pandas as pd
 import sys
 import os
 
-file= sys.argv[1]
+file= sys.argv[1] # The input of the file is the output ratio file from supplementary file 3. and output should look like 'Zerene_cesonia_exon_stat.txt'
 df = pd.read_csv(file, sep = '\t')
 df
 print('Mean','Median','Mode' ,' std', 'var', 'skew', 'kurtosis', sep = '\t')
