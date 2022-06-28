@@ -4,9 +4,8 @@ import py2bit
 
  
 # set up variables
-bit_file = sys.argv[1] # The 2bit file of man we get from UCSC https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/
-
-gff_file =sys.argv[2] # The feature file obtained from https://genome.ucsc.edu/cgi-bin/hgTables, It should look like UCSC_feature_file_sample 
+bit_file = sys.argv[1] # 'hg38.2bit' # The 2bit file of man we get from  UCSC https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/
+gff_file = sys.argv [2] # # The feature file obtained from https://genome.ucsc.edu/cgi-bin/hgTables, It should look like UCSC_feature_file_sample 
   
 
 chr_name = ''
@@ -19,20 +18,22 @@ with open (gff_file) as fh:
         if line.startswith('#'):
             continue
         content = line.strip().split('\t')
+        print(content)
         if chr_name == '' or chr_name != content[0]:
             chr_name = content [0]
             chr_seq_length = len(bd.sequence(str(content[0])))
         chrom = content[0]
-        feature = content[2]
-        start = int(content[3])
-        end = int(content[4])
+        feature = content[3]
+        print(feature)
+        start = int(content[1])
+        end = int(content[2])
         
-        if feature == 'exon':  ## need to customize this code a little bit by looking at the UCSC coodinate file, use UCSC 2bit file for UCSC coodinates
-            exon_start = start
-            exon_end = end
-            if exon_start > exon_end or exon_start < 1 or exon_end < 1 or  exon_start == exon_end or (exon_end-exon_start) < 1 or exon_start > chr_seq_length or exon_end > chr_seq_length:
+        if feature == 'enhancer': ## need to customize this code a little bit by looking at the UCSC coodinate file, use UCSC 2bit file for UCSC coodinates
+            f_start = start
+            f_end = end
+            if exon_start > f_end or f_start < 1 or f_end < 1 or  f_start == f_end or (f_end-f_start) < 1 or f_start > chr_seq_length or f_end > chr_seq_length:
                 continue
-            perseq = bd.sequence(chrom, exon_start, exon_end)    
+            perseq = bd.sequence(chrom, f_start, f_end)    
             A = int(perseq.upper().count('A'))
             T = int(perseq.upper().count('T'))
             G = int(perseq.upper().count('G'))
@@ -79,8 +80,6 @@ with open (gff_file) as fh:
             CT_ratio = round(((CT/ (C*T))*seq_len),2)
             CG_ratio = round(((CG/ (C*G))*seq_len),2)
             CC_ratio = round(((CC/ (C*C))*seq_len),2)
-                #print(content[0],feature, exon_start, exon_end,content[6], CG_ratio, GC_ratio , sep = '\t', file = fout1 )
+            #print(content[0],feature, exon_start, exon_end,content[6], CG_ratio, GC_ratio , sep = '\t', file = fout1 )
             
             print( content[0],feature, exon_start, exon_end,content[6],AA_ratio, AT_ratio, AG_ratio , AC_ratio , TA_ratio , TT_ratio , TG_ratio , TC_ratio , GA_ratio , GT_ratio , GG_ratio , GC_ratio , CA_ratio , CT_ratio , CG_ratio , CC_ratio, sep = "\t")
-
-
