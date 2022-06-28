@@ -1,7 +1,7 @@
 import os
 import sys
 
-file = sys.argv[1]
+file = sys.argv[1] # The input for this is output file from the supplementary file 3 code. The output looks like 'Zerene_cesonia_exon_violin_arranged.txt'
 
 print('Dinucleotide', 'ratio', sep= '\t')
 
