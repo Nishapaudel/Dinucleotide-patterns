@@ -3,8 +3,9 @@ import sys
 import py2bit
 
  
-# set up variables
-bit_file = sys.argv[1]
+# set up variables # The output of this looks like'Zerene_cesonia_exon.txt '
+
+bit_file = sys.argv[1] 
 gff_file =sys.argv[2]
   
 
