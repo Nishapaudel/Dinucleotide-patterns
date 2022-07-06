@@ -34,3 +34,4 @@ Coordinates for exon, intron and promotor were taken from the GFF file, python s
 <p>Supplementary_file_8.a_exons_ratio.py , this code calculates the dinucleotide ratio of exons from GFF and 2bit file of an organism </p>
 <p>Supplementary_file_8.b_intron_ratio.py , this code calculates the dinucleotide ratio of intron  from GFF and 2bit file of an organism</p>
 <p>Supplementary_file_8.c_promo_ratio.py  , this code calculates the dinucleotide ratio of promoter from GFF and 2bit file of an organism </p>
+<p>Supplementary_file_9_PCA_plot.ipynb</p>
