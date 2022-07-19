@@ -31,7 +31,7 @@ with open (gff_file) as fh:
         if feature == 'enhancer': ## need to customize this code a little bit by looking at the UCSC coodinate file, use UCSC 2bit file for UCSC coodinates
             f_start = start
             f_end = end
-            if exon_start > f_end or f_start < 1 or f_end < 1 or  f_start == f_end or (f_end-f_start) < 1 or f_start > chr_seq_length or f_end > chr_seq_length:
+            if f_start > f_end or f_start < 1 or f_end < 1 or  f_start == f_end or (f_end-f_start) < 1 or f_start > chr_seq_length or f_end > chr_seq_length:
                 continue
             perseq = bd.sequence(chrom, f_start, f_end)    
             A = int(perseq.upper().count('A'))
@@ -82,4 +82,4 @@ with open (gff_file) as fh:
             CC_ratio = round(((CC/ (C*C))*seq_len),2)
             #print(content[0],feature, exon_start, exon_end,content[6], CG_ratio, GC_ratio , sep = '\t', file = fout1 )
             
-            print( content[0],feature, exon_start, exon_end,content[6],AA_ratio, AT_ratio, AG_ratio , AC_ratio , TA_ratio , TT_ratio , TG_ratio , TC_ratio , GA_ratio , GT_ratio , GG_ratio , GC_ratio , CA_ratio , CT_ratio , CG_ratio , CC_ratio, sep = "\t")
+            print( content[0],feature, f_start, f_end,content[6],AA_ratio, AT_ratio, AG_ratio , AC_ratio , TA_ratio , TT_ratio , TG_ratio , TC_ratio , GA_ratio , GT_ratio , GG_ratio , GC_ratio , CA_ratio , CT_ratio , CG_ratio , CC_ratio, sep = "\t")
