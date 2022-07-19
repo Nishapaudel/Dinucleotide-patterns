@@ -56,7 +56,7 @@ head(x$GeneCounts)
 
 xx <- x$GeneCounts
 
-rpm <- xx / colSums(xx) * 1000000
+rpm <- apply(xx,2,function(x) {x/sum(x)} ) * 1000000
 
 lrpm <- log10(rpm+1)
 
@@ -90,7 +90,6 @@ writeLines(low,con="fly_low.txt")
 ```
 
 Now get the gene sequences and load into R.
-
 
 ```{r,fly3}
 
@@ -190,6 +189,75 @@ save.image("fly.Rdata")
 
 ```
 
+Now look at the amino acid composition starting with CDS sequence.
+
+Select one representative CDS per gene.
+
+```{r,flycod1}
+
+download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/drosophila_melanogaster/cds/Drosophila_melanogaster.BDGP6.cds.all.fa.gz",destfile="fly_cds.fa.gz")
+gunzip("fly_cds.fa.gz",overwrite=TRUE,remove=FALSE)
+fa <- read.fasta("fly_cds.fa.gz")
+seqinfo <- unlist(getAnnot(fa))
+genes <- gsub("gene:","",sapply(strsplit(seqinfo," "),"[[",4))
+mygene <- unique(genes)[1]
+
+myseqs <- lapply(unique(genes),function(g) {
+  myseq <- head(fa[which(genes %in% g)],1)
+})
+
+seqinfo <- unlist(getAnnot(myseqs))
+genes <- gsub("gene:","",sapply(strsplit(seqinfo," "),"[[",4))
+fa_high <- myseqs[which(genes %in% high)]
+fa_med <- myseqs[which(genes %in% med)]
+fa_low <- myseqs[which(genes %in% low)]
+codon_high <- uco(unlist(fa_high),index="rscu",as.data.frame=TRUE)
+codon_high <- codon_high[order(codon_high$AA),]
+codon_med <- uco(unlist(fa_med),index="rscu",as.data.frame=TRUE)
+codon_med <- codon_med[order(codon_med$AA),]
+codon_low <- uco(unlist(fa_low),index="rscu",as.data.frame=TRUE)
+codon_low <- codon_low[order(codon_low$AA),]
+codons <- data.frame(codon_low$RSCU,  codon_med$RSCU, codon_high$RSCU )
+rownames(codons) <- paste(codon_low$AA, codon_low$codon)
+
+ymin=min(codons)
+ymax=max(codons)
+par(mar=c(8,5,3,1))
+plot(codons[,1],xaxt = "n",pch=19,col="blue",cex=2,
+  ylim=c(ymin,ymax),ylab="RSCU",xlab="")
+axis(1, at=1:nrow(codons), labels=rownames(codons),las=2,cex.axis=0.5)
+points(codons[,2],pch=19,col="gray",cex=2)
+points(codons[,3],pch=19,col="red",cex=2)
+grid()
+
+```
+
+Now take a look at the amino acids encoded.
+
+```{r,flypep1}
+
+pep_high <- aggregate(eff ~ AA,codon_high,sum)
+aa <- as.character(pep_high[,1])
+pep_high <- pep_high[,2]
+pep_med <- aggregate(eff ~ AA,codon_med,sum)
+pep_med <- pep_med[,2]
+pep_low <- aggregate(eff ~ AA,codon_low,sum)
+pep_low <- pep_low[,2]
+pep <- cbind(pep_high,pep_med,pep_low)
+rownames(pep) <- aa
+pep <- pep[which(rownames(pep)!="Stp"),]
+pep <- apply(pep,2,function(x) {x/sum(x)} )
+
+ymin=min(pep)
+ymax=max(pep)
+plot(pep[,3],xaxt = "n",pch=19,col="blue",cex=2,
+  ylim=c(ymin,ymax), xlab="amino acid",ylab="frequency")
+axis(1, at=1:nrow(pep), labels=rownames(pep),las=2)
+points(pep[,2],pch=19,col="gray",cex=2)
+points(pep[,1],pch=19,col="red",cex=2)
+
+```
+
 ## Human
 
 The study ERP000546 consists of different human tissues.
@@ -211,7 +279,7 @@ head(x$GeneCounts) %>%
 
 xx <- x$GeneCounts
 
-rpm <- xx / colSums(xx) * 1000000
+rpm <- apply(xx,2,function(x) {x/sum(x)} ) * 1000000
 
 lrpm <- log10(rpm+1)
 
@@ -338,6 +406,78 @@ rep <- apply(res2,2,function(x) { log2(x[3]/x[1]) } )
 barplot(rep,ylab="log2 fold enrichment in higher expressed genes")
 
 save.image("hum.Rdata")
+
+```
+
+Now look at the amino acid composition starting with CDS sequence.
+
+Select one representative CDS per gene.
+
+```{r,humcod1}
+
+download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cds/Homo_sapiens.GRCh38.cds.all.fa.gz",
+  destfile="hum_cds.fa.gz")
+gunzip("hum_cds.fa.gz",overwrite=TRUE,remove=FALSE)
+fa <- read.fasta("hum_cds.fa.gz")
+seqinfo <- unlist(getAnnot(fa))
+genes <- gsub("gene:","",sapply(strsplit(seqinfo," "),"[[",4))
+mygene <- unique(genes)[1]
+
+myseqs <- lapply(unique(genes),function(g) {
+  myseq <- head(fa[which(genes %in% g)],1)
+})
+
+seqinfo <- unlist(getAnnot(myseqs))
+genes <- gsub("gene:","",sapply(strsplit(seqinfo," "),"[[",4))
+genes <- sapply(strsplit(genes,"\\."),"[[",1)
+
+fa_high <- myseqs[which(genes %in% high)]
+fa_med <- myseqs[which(genes %in% med)]
+fa_low <- myseqs[which(genes %in% low)]
+codon_high <- uco(unlist(fa_high),index="rscu",as.data.frame=TRUE)
+codon_high <- codon_high[order(codon_high$AA),]
+codon_med <- uco(unlist(fa_med),index="rscu",as.data.frame=TRUE)
+codon_med <- codon_med[order(codon_med$AA),]
+codon_low <- uco(unlist(fa_low),index="rscu",as.data.frame=TRUE)
+codon_low <- codon_low[order(codon_low$AA),]
+codons <- data.frame(codon_low$RSCU,  codon_med$RSCU, codon_high$RSCU )
+rownames(codons) <- paste(codon_low$AA, codon_low$codon)
+
+ymin=min(codons)
+ymax=max(codons)
+par(mar=c(8,5,3,1))
+plot(codons[,1],xaxt = "n",pch=19,col="blue",cex=2,
+  ylim=c(ymin,ymax),ylab="RSCU",xlab="")
+axis(1, at=1:nrow(codons), labels=rownames(codons),las=2,cex.axis=0.5)
+points(codons[,2],pch=19,col="gray",cex=2)
+points(codons[,3],pch=19,col="red",cex=2)
+grid()
+
+```
+
+Now take a look at the amino acids encoded.
+
+```{r,humpep1}
+
+pep_high <- aggregate(eff ~ AA,codon_high,sum)
+aa <- as.character(pep_high[,1])
+pep_high <- pep_high[,2]
+pep_med <- aggregate(eff ~ AA,codon_med,sum)
+pep_med <- pep_med[,2]
+pep_low <- aggregate(eff ~ AA,codon_low,sum)
+pep_low <- pep_low[,2]
+pep <- cbind(pep_high,pep_med,pep_low)
+rownames(pep) <- aa
+pep <- pep[which(rownames(pep)!="Stp"),]
+pep <- apply(pep,2,function(x) {x/sum(x)} )
+
+ymin=min(pep)
+ymax=max(pep)
+plot(pep[,3],xaxt = "n",pch=19,col="blue",cex=2,
+  ylim=c(ymin,ymax), xlab="amino acid",ylab="frequency")
+axis(1, at=1:nrow(pep), labels=rownames(pep),las=2)
+points(pep[,2],pch=19,col="gray",cex=2)
+points(pep[,1],pch=19,col="red",cex=2)
 
 ```
 
