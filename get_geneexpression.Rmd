@@ -49,10 +49,9 @@ SRRvec <- as.vector(mdat1$SRR_accession)
 
 x <- getDEE2("dmelanogaster",SRRvec,metadata=mdat,counts="GeneCounts",legacy=TRUE)
 
-head(x$GeneCounts) 
-#%>%
-#  kbl(caption="sample of gene expression data") %>%
-#  kable_paper("hover", full_width = F)
+head(x$GeneCounts) %>%
+  kbl(caption="sample of gene expression data") %>%
+  kable_paper("hover", full_width = F)
 
 xx <- x$GeneCounts
 
@@ -93,10 +92,10 @@ Now get the gene sequences and load into R.
 
 ```{r,fly3}
 
-download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/drosophila_melanogaster/cdna/Drosophila_melanogaster.BDGP6.cdna.all.fa.gz", 
-  destfile="fly_cdna.fa.gz")
-
-gunzip("fly_cdna.fa.gz",overwrite=TRUE,remove=FALSE)
+if ( ! file.exists("fly_cdna.fa.gz") ) {
+  download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/drosophila_melanogaster/cdna/Drosophila_melanogaster.BDGP6.cdna.all.fa.gz", 
+    destfile="fly_cdna.fa.gz")
+}
 
 fa <- read.fasta("fly_cdna.fa.gz")
 
@@ -195,8 +194,10 @@ Select one representative CDS per gene.
 
 ```{r,flycod1}
 
-download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/drosophila_melanogaster/cds/Drosophila_melanogaster.BDGP6.cds.all.fa.gz",destfile="fly_cds.fa.gz")
-gunzip("fly_cds.fa.gz",overwrite=TRUE,remove=FALSE)
+if ( ! file.exists("fly_cds.fa.gz") ) {
+  download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/drosophila_melanogaster/cds/Drosophila_melanogaster.BDGP6.cds.all.fa.gz",
+    destfile="fly_cds.fa.gz")
+}
 fa <- read.fasta("fly_cds.fa.gz")
 seqinfo <- unlist(getAnnot(fa))
 genes <- gsub("gene:","",sapply(strsplit(seqinfo," "),"[[",4))
@@ -220,14 +221,18 @@ codon_low <- codon_low[order(codon_low$AA),]
 codons <- data.frame(codon_low$RSCU,  codon_med$RSCU, codon_high$RSCU )
 rownames(codons) <- paste(codon_low$AA, codon_low$codon)
 
+codons %>%
+  kbl(caption="RSCU of high med and low expressed genes") %>%
+  kable_paper("hover", full_width = F)
+
 ymin=min(codons)
 ymax=max(codons)
 par(mar=c(8,5,3,1))
-plot(codons[,1],xaxt = "n",pch=19,col="blue",cex=2,
+plot(codons[,1],xaxt = "n",pch=19,col="blue",cex=1,
   ylim=c(ymin,ymax),ylab="RSCU",xlab="")
 axis(1, at=1:nrow(codons), labels=rownames(codons),las=2,cex.axis=0.5)
-points(codons[,2],pch=19,col="gray",cex=2)
-points(codons[,3],pch=19,col="red",cex=2)
+points(codons[,2],pch=19,col="gray",cex=1)
+points(codons[,3],pch=19,col="red",cex=1)
 grid()
 
 ```
@@ -247,6 +252,10 @@ pep <- cbind(pep_high,pep_med,pep_low)
 rownames(pep) <- aa
 pep <- pep[which(rownames(pep)!="Stp"),]
 pep <- apply(pep,2,function(x) {x/sum(x)} )
+
+pep %>%
+  kbl(caption="Amino acid frequency in high med and low expressed genes") %>%
+  kable_paper("hover", full_width = F)
 
 ymin=min(pep)
 ymax=max(pep)
@@ -314,10 +323,10 @@ writeLines(low,con="hum_low.txt")
 
 ```{r,hum3}
 
-download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-  destfile="hum_cdna.fa.gz")
-
-gunzip("hum_cdna.fa.gz",overwrite=TRUE,remove=FALSE)
+if ( ! file.exists("hum_cdna.fa.gz") ) {
+  download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+    destfile="hum_cdna.fa.gz")
+}
 
 fa <- read.fasta("hum_cdna.fa.gz")
 
@@ -415,9 +424,11 @@ Select one representative CDS per gene.
 
 ```{r,humcod1}
 
-download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cds/Homo_sapiens.GRCh38.cds.all.fa.gz",
-  destfile="hum_cds.fa.gz")
-gunzip("hum_cds.fa.gz",overwrite=TRUE,remove=FALSE)
+if ( ! file.exist("hum_cds.fa.gz") ) {
+  download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cds/Homo_sapiens.GRCh38.cds.all.fa.gz",
+    destfile="hum_cds.fa.gz")
+}
+
 fa <- read.fasta("hum_cds.fa.gz")
 seqinfo <- unlist(getAnnot(fa))
 genes <- gsub("gene:","",sapply(strsplit(seqinfo," "),"[[",4))
@@ -443,14 +454,18 @@ codon_low <- codon_low[order(codon_low$AA),]
 codons <- data.frame(codon_low$RSCU,  codon_med$RSCU, codon_high$RSCU )
 rownames(codons) <- paste(codon_low$AA, codon_low$codon)
 
+codons %>%
+  kbl(caption="RSCU of high med and low expressed genes") %>%
+  kable_paper("hover", full_width = F)
+
 ymin=min(codons)
 ymax=max(codons)
 par(mar=c(8,5,3,1))
-plot(codons[,1],xaxt = "n",pch=19,col="blue",cex=2,
+plot(codons[,1],xaxt = "n",pch=19,col="blue",cex=1,
   ylim=c(ymin,ymax),ylab="RSCU",xlab="")
 axis(1, at=1:nrow(codons), labels=rownames(codons),las=2,cex.axis=0.5)
-points(codons[,2],pch=19,col="gray",cex=2)
-points(codons[,3],pch=19,col="red",cex=2)
+points(codons[,2],pch=19,col="gray",cex=1)
+points(codons[,3],pch=19,col="red",cex=1)
 grid()
 
 ```
@@ -470,6 +485,10 @@ pep <- cbind(pep_high,pep_med,pep_low)
 rownames(pep) <- aa
 pep <- pep[which(rownames(pep)!="Stp"),]
 pep <- apply(pep,2,function(x) {x/sum(x)} )
+
+pep %>%
+  kbl(caption="Amino acid frequency in high med and low expressed genes") %>%
+  kable_paper("hover", full_width = F)
 
 ymin=min(pep)
 ymax=max(pep)
