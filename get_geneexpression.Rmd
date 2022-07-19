@@ -1,0 +1,353 @@
+---
+title: "Stratifying gene expression levels for dinucleotide analysis"
+author: "Mark Ziemann & Nisha Paudel"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    fig_width: 7
+    fig_height: 7
+theme: cosmo
+---
+
+
+## Introduction
+
+Here I want to download gene expression data for human and fly and rank the genes by their overall
+gene expression.
+The data will be fetched from DEE2.io with accession numbers SRP002072 (fly) and ERP000546 (human).
+Then we will look at their dinucleotide profiles in high, medium and low expressed genes.
+
+
+```{r,libs}
+
+suppressPackageStartupMessages({
+  library("R.utils")
+  library("getDEE2")
+  library("kableExtra")
+  library("seqinr")
+  library("gplots")
+
+})
+
+```
+
+## Drosophila
+
+Study SRP002072 was published in 2011 as the first transcriptome of D. melanogaster, sampling
+10 developmental stages.
+
+```{r,fly1}
+
+mdat <- getDEE2Metadata("dmelanogaster")
+
+mdat1 <- mdat[which(mdat$SRP_accession %in% "SRP002072"),]
+
+SRRvec <- as.vector(mdat1$SRR_accession)
+
+x <- getDEE2("dmelanogaster",SRRvec,metadata=mdat,counts="GeneCounts",legacy=TRUE)
+
+head(x$GeneCounts) 
+#%>%
+#  kbl(caption="sample of gene expression data") %>%
+#  kable_paper("hover", full_width = F)
+
+xx <- x$GeneCounts
+
+rpm <- xx / colSums(xx) * 1000000
+
+lrpm <- log10(rpm+1)
+
+means <- rowMeans(lrpm)
+
+hist(means)
+
+```
+
+Now separate high, medium and low expressed genes into text files.
+
+```{r,fly2}
+
+means <- means[order(means)]
+
+qnt <- rev(quantile(means,seq(0,1,1/3)))
+qnt <- qnt[2:length(qnt)]
+
+high <- names(which(means > qnt[1]))
+med <- names(which(means < qnt[1] & means > qnt[2] ))
+low <- names(which(means < qnt[2]))
+
+str(high)
+str(med)
+str(low)
+
+writeLines(high,con="fly_high.txt")
+writeLines(med,con="fly_med.txt")
+writeLines(low,con="fly_low.txt")
+
+```
+
+Now get the gene sequences and load into R.
+
+
+```{r,fly3}
+
+download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/drosophila_melanogaster/cdna/Drosophila_melanogaster.BDGP6.cdna.all.fa.gz", 
+  destfile="fly_cdna.fa.gz")
+
+gunzip("fly_cdna.fa.gz",overwrite=TRUE,remove=FALSE)
+
+fa <- read.fasta("fly_cdna.fa.gz")
+
+```
+
+Now the tricky part is to select one representative transcript isoform for each gene
+(the first one in the fasta file).
+
+```{r,fly4}
+
+seqinfo <- unlist(getAnnot(fa))
+
+genes <- gsub("gene:","",sapply(strsplit(seqinfo," "),"[[",4))
+
+mygene <- unique(genes)[1]
+
+myseqs <- lapply(unique(genes),function(g) {
+  myseq <- head(fa[which(genes %in% g)],1)
+})
+
+```
+
+Great. Now need to group the sequences by their membership in high, medium or low groups.
+
+```{r,fly5}
+
+seqinfo <- unlist(getAnnot(myseqs))
+
+genes <- gsub("gene:","",sapply(strsplit(seqinfo," "),"[[",4))
+
+fa_high <- myseqs[which(genes %in% high)]
+
+fa_med <- myseqs[which(genes %in% med)]
+
+fa_low <- myseqs[which(genes %in% low)]
+
+```
+
+Now here I can show the nucleotide content of high, medium and low expressed genes.
+
+```{r,fly6}
+
+count_high1 <- seqinr::count(seq=unlist(fa_high),wordsize=1,freq=TRUE)
+count_med1 <- seqinr::count(seq=unlist(fa_med),wordsize=1,freq=TRUE)
+count_low1 <- seqinr::count(seq=unlist(fa_low),wordsize=1,freq=TRUE)
+res1 <- rbind(count_low1, count_med1, count_high1)
+res1 %>%
+  kbl(caption="comparison of nucleotide content of high, medium and low expressed genes in drosophila") %>%
+  kable_paper("hover", full_width = F)
+
+```
+
+Now here I can show the dinucleotide content of high, medium and low expressed genes.
+
+```{r,fly7}
+
+count_high2 <- seqinr::count(seq=unlist(fa_high),wordsize=2,freq=TRUE)
+count_med2 <- seqinr::count(seq=unlist(fa_med),wordsize=2,freq=TRUE)
+count_low2 <- seqinr::count(seq=unlist(fa_low),wordsize=2,freq=TRUE)
+res2 <- rbind(count_low2, count_med2, count_high2)
+res2 %>%
+  kbl(caption="comparison of dinucleotide content of high, medium and low expressed genes in drosophila") %>%
+  kable_paper("hover", full_width = F)
+
+```
+
+Super. Now we can make a chart of dinucleotide differences.
+
+```{r,fly8}
+
+ymin=min(res2)
+ymax=max(res2)
+plot(res2[1,],xaxt = "n",pch=19,col="blue",cex=2,
+  ylim=c(ymin,ymax), xlab="dinucleotide",ylab="frequency")
+axis(1, at=1:ncol(res2), labels=colnames(res2))
+points(res2[2,],pch=19,col="gray",cex=2)
+points(res2[3,],pch=19,col="red",cex=2)
+
+```
+
+Now we can look at whether the dinucleotides are more highly represented in higher expressed genes as compared to lowly expressed.
+
+```{r,fly9}
+
+rep <- apply(res2,2,function(x) { log2(x[3]/x[1]) } )
+
+barplot(rep,ylab="log2 fold enrichment in higher expressed genes")
+
+save.image("fly.Rdata")
+
+```
+
+## Human
+
+The study ERP000546 consists of different human tissues.
+
+
+```{r,hum1}
+
+mdat <- getDEE2Metadata("hsapiens")
+
+mdat1 <- mdat[which(mdat$SRP_accession %in% "ERP000546"),]
+
+SRRvec <- as.vector(mdat1$SRR_accession)
+
+x <- getDEE2("hsapiens",SRRvec,metadata=mdat,counts="GeneCounts",legacy=TRUE)
+
+head(x$GeneCounts) %>%
+  kbl(caption="sample of gene expression data") %>%
+  kable_paper("hover", full_width = F)
+
+xx <- x$GeneCounts
+
+rpm <- xx / colSums(xx) * 1000000
+
+lrpm <- log10(rpm+1)
+
+means <- rowMeans(lrpm)
+
+hist(means)
+
+```
+
+Now separate high, medium and low expressed genes into text files.
+
+```{r,hum2}
+
+means <- means[order(means)]
+
+qnt <- rev(quantile(means,seq(0,1,1/3)))
+qnt <- qnt[2:length(qnt)]
+
+high <- names(which(means > qnt[1]))
+med <- names(which(means < qnt[1] & means > qnt[2] ))
+low <- names(which(means < qnt[2]))
+
+str(high)
+str(med)
+str(low)
+
+writeLines(high,con="hum_high.txt")
+writeLines(med,con="hum_med.txt")
+writeLines(low,con="hum_low.txt")
+
+```
+
+```{r,hum3}
+
+download.file("ftp://ftp.ensembl.org/pub/release-90/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+  destfile="hum_cdna.fa.gz")
+
+gunzip("hum_cdna.fa.gz",overwrite=TRUE,remove=FALSE)
+
+fa <- read.fasta("hum_cdna.fa.gz")
+
+```
+
+Now the tricky part is to select one representative transcript isoform for each gene
+(the first one in the fasta file).
+
+```{r,hum4}
+
+seqinfo <- unlist(getAnnot(fa))
+
+genes <- gsub("gene:","",sapply(strsplit(seqinfo," "),"[[",4))
+
+mygene <- unique(genes)[1]
+
+myseqs <- lapply(unique(genes),function(g) {
+  myseq <- head(fa[which(genes %in% g)],1)
+})
+
+```
+
+Great. Now need to group the sequences by their membership in high, medium or low groups.
+
+```{r,hum5}
+
+seqinfo <- unlist(getAnnot(myseqs))
+
+genes <- gsub("gene:","",sapply(strsplit(seqinfo," "),"[[",4))
+genes <- sapply(strsplit(genes,"\\."),"[[",1)
+
+fa_high <- myseqs[which(genes %in% high)]
+
+fa_med <- myseqs[which(genes %in% med)]
+
+fa_low <- myseqs[which(genes %in% low)]
+
+```
+
+```{r,hum6}
+
+count_high1 <- seqinr::count(seq=unlist(fa_high),wordsize=1,freq=TRUE)
+count_med1 <- seqinr::count(seq=unlist(fa_med),wordsize=1,freq=TRUE)
+count_low1 <- seqinr::count(seq=unlist(fa_low),wordsize=1,freq=TRUE)
+res1 <- rbind(count_low1, count_med1, count_high1)
+res1 %>%
+  kbl(caption="comparison of nucleotide content of high, medium and low expressed genes in human") %>%
+  kable_paper("hover", full_width = F)
+
+```
+
+Now here I can show the dinucleotide content of high, medium and low expressed genes.
+
+```{r,hum7}
+
+count_high2 <- seqinr::count(seq=unlist(fa_high),wordsize=2,freq=TRUE)
+count_med2 <- seqinr::count(seq=unlist(fa_med),wordsize=2,freq=TRUE)
+count_low2 <- seqinr::count(seq=unlist(fa_low),wordsize=2,freq=TRUE)
+res2 <- rbind(count_low2, count_med2, count_high2)
+res2 %>%
+  kbl(caption="comparison of dinucleotide content of high, medium and low expressed genes in human") %>%
+  kable_paper("hover", full_width = F)
+
+```
+
+Super. Now we can make a chart of dinucleotide differences.
+
+```{r,hum8}
+
+ymin=min(res2)
+ymax=max(res2)
+plot(res2[1,],xaxt = "n",pch=19,col="blue",cex=2,
+  ylim=c(ymin,ymax), xlab="dinucleotide",ylab="frequency")
+axis(1, at=1:ncol(res2), labels=colnames(res2))
+points(res2[2,],pch=19,col="gray",cex=2)
+points(res2[3,],pch=19,col="red",cex=2)
+
+```
+
+Now we can look at whether the dinucleotides are more highly represented in higher expressed genes as compared to lowly expressed.
+
+```{r,hum9}
+
+rep <- apply(res2,2,function(x) { log2(x[3]/x[1]) } )
+
+barplot(rep,ylab="log2 fold enrichment in higher expressed genes")
+
+save.image("hum.Rdata")
+
+```
+
+## Session
+
+For reproducibility.
+
+```{r,sessioninfo}
+
+sessionInfo()
+
+```
+
