@@ -18,13 +18,13 @@ with open (gff_file) as fh:
         if line.startswith('#'):
             continue
         content = line.strip().split('\t')
-        print(content)
+        #print(content)
         if chr_name == '' or chr_name != content[0]:
             chr_name = content [0]
             chr_seq_length = len(bd.sequence(str(content[0])))
         chrom = content[0]
         feature = content[3]
-        print(feature)
+        #print(feature)
         start = int(content[1])
         end = int(content[2])
         
