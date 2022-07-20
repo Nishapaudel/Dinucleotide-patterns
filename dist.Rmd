@@ -1,0 +1,105 @@
+---
+title: "Quantifying diversity in dinucleotide content across Eukaryotic kingdoms"
+author: "Mark Ziemann & Nisha Paudel"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    fig_width: 5
+    fig_height: 5
+theme: cosmo
+---
+
+
+## Introduction
+
+Here I will be calculating the Euclidean distance separating organisms of different
+
+
+```{r,libs}
+
+suppressPackageStartupMessages({
+  library("vioplot")
+  library("beeswarm")
+  library("kableExtra")
+  library("seqinr")
+  library("gplots")
+})
+
+```
+
+Load data.
+
+```{r,load}
+
+dat <- read.csv("new_all.csv")
+head(dat)
+
+```
+
+Separate into groups.
+
+ [1] "Mammals"       "Birds"         "Reptiles"      "Amphibians"   
+ [5] "Fishes"        "Plants"        "Chlorophyta"   "Invertebrates"
+ [9] "Fungi"         "Protozoa"   
+
+```{r,sep_data}
+
+unique(dat$class)
+
+mammals <- subset(dat,class=="Mammals")
+fishes <- subset(dat,class=="Fishes")
+birds <- subset(dat,class=="Birds")
+fungi <- subset(dat,class=="Fungi")
+plants <- subset(dat,class=="Plants")
+protozoa <- subset(dat,class=="Protozoa")
+reptiles <- subset(dat,class=="Reptiles")
+chlorophyta <- subset(dat,class=="Chlorophyta")
+amphibians <- subset(dat,class=="Amphibians")
+invertebrates <- subset(dat,class=="Invertebrates")
+
+l <- list("mammals"=mammals, "fishes"=fishes, "birds"=birds, "fungi"=fungi,
+  "plants"=plants, "protozoa"=protozoa, "reptiles"=reptiles, 
+  "chlorophyta"=chlorophyta, "amphibians"=amphibians, "invertebrates"=invertebrates)
+
+```
+
+Now to examine the diversity with mean Eucledian distance.
+
+```{r,dist1}
+
+res <- lapply(l,function(df) {
+  df$class <- NULL
+  dfa <- aggregate(. ~ name, df, mean)
+  rownames(dfa) <- dfa$name
+  dfa$name <- NULL
+  as.vector(dist(dfa))
+})
+
+message("mean")
+lapply(res,mean)
+
+message("median")
+lapply(res,median)
+
+res2 <- res[order(unlist(lapply(res,median)))]
+
+par(mar=c(5,7,3,1))
+vioplot(res2,horizontal=TRUE,las=1,main="distribution of Euclidean distance") ; grid()
+barplot(unlist(lapply(res2,mean)),horiz=TRUE,las=1,main="mean Euclidean distance") ; grid()
+barplot(unlist(lapply(res2,mean)),horiz=TRUE,las=1,main="median Euclidean distance") ; grid()
+
+
+```
+
+## Session
+
+Session info
+
+```{r,session}
+
+sessionInfo()
+
+```
