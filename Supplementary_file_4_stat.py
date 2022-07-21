@@ -10,7 +10,7 @@ df
 print('Mean','Median','Mode' ,' std', 'var', 'skew', 'kurtosis', sep = '\t')
 for i in df.columns[4:20]:
     x = df[i].mean()
-    y = df[i].mean()
+    y = df[i].median()
     z = df[i].mode()
     a = df[i].std()
     b = df[i].var()
