@@ -1,18 +1,7 @@
-import sys
-import os
+import numpy as np
 import holoviews as hv
-from holoviews import dim
-from  bokeh.sampledata.autompg import autompg
+from holoviews import opts
 hv.extension('bokeh')
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from scipy import stats
-import statistics as stat
-import math
-import matplotlib.pyplot as plt
-import numpy as np
-from scipy.stats import norm
 
 
  
