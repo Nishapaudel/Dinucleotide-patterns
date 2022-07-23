@@ -15,7 +15,7 @@ The latest versions of eukaryotic genome sequences available on NCBI’s RefSeq 
  
 <h3>Calculation of ratio from the various genomic regions of Homo sapiens.</h3>
  
-Coordinations for various genome regions were taken from the UCSC genome browser (https://genome.ucsc.edu/cgi-bin/hgTables ). An in-house python code was written to calculate ratios(Supplementary file 3), and statistics (Supplementary file 4). A violin plot was made ( Supplementary files 5 and 6).  A median value was taken from the ratio and a cluster heat map was constructed by Seaborn package python based on euclidian distance (Supplementary file 7).   
+Coordinations for various genome regions were taken from the UCSC genome browser (https://genome.ucsc.edu/cgi-bin/hgTables ). An in-house python code was written to calculate ratios(Supplementary file 3), and median (Supplementary file 4). A violin plot was made ( Supplementary files 5 and 6).  A median value was taken from the ratio and a cluster heat map was constructed by Seaborn package python based on euclidian distance (Supplementary file 7).   
  
  
 <h3>Calculation of ratio from the exon  of the eukaryotes genome.</h3>
