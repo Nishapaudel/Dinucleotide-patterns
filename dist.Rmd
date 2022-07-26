@@ -91,6 +91,72 @@ vioplot(res2,horizontal=TRUE,las=1,main="distribution of Euclidean distance") ; 
 barplot(unlist(lapply(res2,mean)),horiz=TRUE,las=1,main="mean Euclidean distance") ; grid()
 barplot(unlist(lapply(res2,mean)),horiz=TRUE,las=1,main="median Euclidean distance") ; grid()
 
+```
+
+## Heatmaps
+
+```{r,heatmaps}
+
+chlorophyta$class = NULL
+rownames(chlorophyta) <- chlorophyta$name
+chlorophyta$name = NULL
+hm_chlorophyta <- heatmap.2(as.matrix(chlorophyta),trace="none",main="chlorophyta",
+  scale="none",mar=c(12,12),cexRow=0.8, dendrogram="row", Colv=FALSE)
+
+protozoa$class = NULL
+rownames(protozoa) <- protozoa$name
+protozoa$name = NULL
+hm_protozoa <- heatmap.2(as.matrix(protozoa),trace="none", main="protozoa",
+  scale="none",mar=c(3,12),cexRow=0.8, dendrogram="row", Colv=FALSE)
+
+invertebrates$class = NULL
+rownames(invertebrates) <- invertebrates$name
+invertebrates$name = NULL
+hm_invertebrates <- heatmap.2(as.matrix(invertebrates),trace="none", main="invertebrates",
+  scale="none",mar=c(3,12),cexRow=0.8, dendrogram="row", Colv=FALSE)
+
+mammals$class = NULL
+rownames(mammals) <- mammals$name
+mammals$name = NULL
+hm_mammals <- heatmap.2(as.matrix(mammals),trace="none",main="mammals",
+  scale="none",mar=c(3,12),cexRow=0.8, dendrogram="row", Colv=FALSE)
+
+fishes$class = NULL
+fishes <- aggregate(. ~ name, fishes, mean)
+rownames(fishes) <- fishes$name
+fishes$name = NULL
+hm_fishes <- heatmap.2(as.matrix(fishes),trace="none",main="fishes",
+  scale="none",mar=c(3,12),cexRow=0.8, dendrogram="row", Colv=FALSE)
+
+birds$class = NULL
+rownames(birds) <- birds$name
+birds$name = NULL
+hm_birds <- heatmap.2(as.matrix(birds),trace="none",main="birds",
+  scale="none",mar=c(3,12),cexRow=0.8, dendrogram="row", Colv=FALSE)
+
+fungi$class = NULL
+rownames(fungi) <- fungi$name
+fungi$name = NULL
+hm_fungi <- heatmap.2(as.matrix(fungi),trace="none",main="fungi",
+  scale="none",mar=c(3,12),cexRow=0.8, dendrogram="row", Colv=FALSE)
+
+plants$class = NULL
+rownames(plants) <- plants$name
+plants$name = NULL
+hm_plants <- heatmap.2(as.matrix(plants),trace="none",main="plants",
+  scale="none",mar=c(3,12),cexRow=0.8, dendrogram="row", Colv=FALSE)
+
+reptiles$class = NULL
+rownames(reptiles) <- reptiles$name
+reptiles$name = NULL
+hm_reptiles <- heatmap.2(as.matrix(reptiles),trace="none",main="reptiles",
+  scale="none",mar=c(3,12),cexRow=0.8, dendrogram="row", Colv=FALSE)
+
+amphibians$class = NULL
+rownames(amphibians) <- amphibians$name
+amphibians$name = NULL
+hm_amphibians <- heatmap.2(as.matrix(amphibians),trace="none",main="amphibians",
+  scale="none",mar=c(12,12),cexRow=0.8, dendrogram="row", Colv=FALSE)
 
 ```
 
