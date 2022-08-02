@@ -2,7 +2,7 @@ import os
 import sys
 import py2bit
 
-# This output of this code should look in the format like 'Zerene_cesonia_exon.txt' as uploaded  
+# The output of this code should look in the format like 'Zerene_cesonia_exon.txt' as uploaded  
 # set up variables
 bit_file = sys.argv[1] # 'hg38.2bit' # The 2bit file of human we get from  UCSC https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/
 gff_file = sys.argv [2] # # The feature file obtained from https://genome.ucsc.edu/cgi-bin/hgTables, It should look like UCSC_feature_file_sample 
