@@ -121,7 +121,7 @@ MarkupSafe==1.1.1
 matplotlib @ file:///tmp/build/80754af9/matplotlib-base_1603378225747/work
 matplotlib-venn @ file:///home/conda/feedstock_root/build_artifacts/matplotlib-venn_1649683705332/work
 mccabe==0.6.1
-mistune==0.8.4
+mistune==2.0.3
 mkl-fft==1.2.0
 mkl-random==1.1.1
 mkl-service==2.3.0
