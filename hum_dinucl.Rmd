@@ -1,0 +1,115 @@
+---
+title: "Quantifying dinucleotide diversity in human exons"
+author: "Mark Ziemann & Nisha Paudel"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    fig_width: 7
+    fig_height: 7
+theme: cosmo
+---
+
+## Introduction
+
+Here I will be examining dinucleotide profiles in human genes.
+
+```{r,libs}
+
+suppressPackageStartupMessages({
+  library("parallel")
+  library("vioplot")
+  library("beeswarm")
+  library("kableExtra")
+  library("seqinr")
+  library("gplots")
+  library(rtracklayer)
+})
+
+```
+
+Load data.
+
+```{r,load}
+
+gtfpath="https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.refGene.gtf.gz"
+gtf <- readGFF(gtfpath)
+
+if ( !file.exists("hg38.2bit") ) {
+  download.file("https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.2bit",destfile="hg38.2bit") 
+}
+
+seq <- rtracklayer::TwoBitFile("hg38.2bit")
+
+# need to extract the sequences
+# first make a df of genes
+genes <- unique(gtf[,c("gene_id","transcript_id")])
+# get primary transcript id
+tx <- sapply(unique(genes$gene_id),function(g){ genes[which(genes$gene_id==g),2][1] } )
+# get exons of primary tx
+exons <- gtf[gtf$transcript_id %in% tx,]
+exons <- subset(exons,type=="exon")
+exons <- exons[grep("_",exons$seqid,invert=TRUE),]
+
+```
+
+calc mono and di-nucleotide counts.
+
+```{r,count}
+
+#geneseq <- getSeq(seq, GRanges(exons))
+cores <- detectCores()
+
+myseqs <- mclapply(unique(exons$gene_name),function(g) {
+  myseq <- getSeq(seq,GRanges(exons[which(exons$gene_name==g),c("seqid","start","end")]))
+  myseq <- as.character(unlist(myseq))
+  s2c(myseq)
+} , mc.cores=cores)
+
+mylen <- lapply(myseqs,length)
+
+mono <- mclapply(myseqs,function(x) {
+  seqinr::count(x,wordsize=1,alphabet=c("A","G","T","C"))
+} , mc.cores=cores)
+
+dinuc <- mclapply(myseqs,function(x) {
+  seqinr::count(x,wordsize=2,alphabet=c("A","G","T","C"))
+} , mc.cores=cores)
+
+freq <- mclapply(1:length(myseqs),function(i){
+  AA <- dinuc[[i]][1] / ( mono[[i]][1] * mono[[i]][1] ) * mylen[[i]]
+  AC <- dinuc[[i]][2] / ( mono[[i]][1] * mono[[i]][2] ) * mylen[[i]]
+  AG <- dinuc[[i]][3] / ( mono[[i]][1] * mono[[i]][3] ) * mylen[[i]]
+  AT <- dinuc[[i]][4] / ( mono[[i]][1] * mono[[i]][4] ) * mylen[[i]]
+  CA <- dinuc[[i]][5] / ( mono[[i]][2] * mono[[i]][1] ) * mylen[[i]]
+  CC <- dinuc[[i]][6] / ( mono[[i]][2] * mono[[i]][2] ) * mylen[[i]]
+  CG <- dinuc[[i]][7] / ( mono[[i]][2] * mono[[i]][3] ) * mylen[[i]]
+  CT <- dinuc[[i]][8] / ( mono[[i]][2] * mono[[i]][4] ) * mylen[[i]]
+  GA <- dinuc[[i]][9] / ( mono[[i]][3] * mono[[i]][1] ) * mylen[[i]]
+  GC <- dinuc[[i]][10] / ( mono[[i]][3] * mono[[i]][2] ) * mylen[[i]]
+  GG <- dinuc[[i]][11] / ( mono[[i]][3] * mono[[i]][3] ) * mylen[[i]]
+  GT <- dinuc[[i]][12] / ( mono[[i]][3] * mono[[i]][4] ) * mylen[[i]]
+  TA <- dinuc[[i]][13] / ( mono[[i]][4] * mono[[i]][1] ) * mylen[[i]]
+  TC <- dinuc[[i]][14] / ( mono[[i]][4] * mono[[i]][2] ) * mylen[[i]]
+  TG <- dinuc[[i]][15] / ( mono[[i]][4] * mono[[i]][3] ) * mylen[[i]]
+  TT <- dinuc[[i]][16] / ( mono[[i]][4] * mono[[i]][4] ) * mylen[[i]]
+  c(AA,AC,AG,AT,CA,CC,CG,CT,GA,GC,GG,GT,TA,TC,TG,TT)
+},mc.cores=cores)
+
+df <- do.call(rbind,freq)
+HEADER=paste("dinucleotide frequency for exons of",length(unique(exons$gene_name)),"genes")
+vioplot(df,ylim=c(0,5),cex.names=0.8)
+mtext(HEADER)
+grid()
+
+```
+
+## Session info
+
+```{r,session}
+
+sessionInfo()
+
+```
