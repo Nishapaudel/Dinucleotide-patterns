@@ -264,7 +264,7 @@ urllib3 @ file:///home/conda/feedstock_root/build_artifacts/urllib3_160312570420
 watchdog @ file:///tmp/build/80754af9/watchdog_1593447344699/work
 wcwidth @ file:///tmp/build/80754af9/wcwidth_1593447189090/work
 webencodings==0.5.1
-Werkzeug==1.0.1
+Werkzeug==2.2.3
 wget==3.2
 widgetsnbextension==3.5.1
 wrapt==1.11.2
