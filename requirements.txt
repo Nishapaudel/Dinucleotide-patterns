@@ -254,7 +254,7 @@ threadpoolctl @ file:///tmp/tmp9twdgx9k/threadpoolctl-2.1.0-py3-none-any.whl
 tifffile==2020.10.1
 toml @ file:///tmp/build/80754af9/toml_1592853716807/work
 toolz @ file:///home/conda/feedstock_root/build_artifacts/toolz_1600973991856/work
-tornado==6.0.4
+tornado==6.3.3
 tqdm @ file:///tmp/build/80754af9/tqdm_1602185206534/work
 traitlets @ file:///tmp/build/80754af9/traitlets_1602787416690/work
 typing-extensions @ file:///tmp/build/80754af9/typing_extensions_1598376058250/work
