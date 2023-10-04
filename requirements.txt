@@ -67,7 +67,7 @@ eventlet @ file:///home/conda/feedstock_root/build_artifacts/eventlet_1630500954
 fastcache==1.1.0
 filelock==3.0.12
 flake8 @ file:///home/conda/feedstock_root/build_artifacts/flake8_1601874335748/work
-Flask==1.1.2
+Flask==2.2.5
 Flask-SocketIO @ file:///home/conda/feedstock_root/build_artifacts/flask-socketio_1627873847317/work
 fsspec @ file:///tmp/build/80754af9/fsspec_1602684995936/work
 future==0.18.2
