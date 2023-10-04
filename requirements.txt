@@ -70,7 +70,7 @@ flake8 @ file:///home/conda/feedstock_root/build_artifacts/flake8_1601874335748/
 Flask==1.1.2
 Flask-SocketIO @ file:///home/conda/feedstock_root/build_artifacts/flask-socketio_1627873847317/work
 fsspec @ file:///tmp/build/80754af9/fsspec_1602684995936/work
-future==0.18.2
+future==0.18.3
 gevent @ file:///tmp/build/80754af9/gevent_1601397537062/work
 glob2==0.7
 gmpy2==2.0.8
